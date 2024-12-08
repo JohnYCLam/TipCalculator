@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.CornerSize
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -24,6 +25,7 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Remove
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Slider
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -67,7 +69,8 @@ fun TopHeader(totalPerPerson: Double = 0.0) {
             .fillMaxWidth()
             .height(150.dp)
             //.clip(shape = RoundedCornerShape(corner = CornerSize(15.dp)))
-            .clip(shape = CircleShape.copy(all = CornerSize(15.dp))),
+            .clip(shape = CircleShape.copy(all = CornerSize(20.dp)))
+            .padding(5.dp),
         color = Color(0xFFE9D7F7)
     ) {
         Column(
@@ -91,8 +94,12 @@ fun TopHeader(totalPerPerson: Double = 0.0) {
 @Preview
 @Composable
 fun MainContent() {
-    BillForm() { billAmt ->
-        Log.d("AMT", "Amount: $billAmt")
+
+    Column {
+        TopHeader()
+        BillForm() { billAmt ->
+            Log.d("AMT", "Amount: $billAmt")
+        }
     }
 }
 
@@ -101,6 +108,8 @@ fun BillForm(modifier: Modifier = Modifier, onValChange: (String) -> Unit = {}) 
     val totalBillState = remember { mutableStateOf("") }
     val validState = remember(totalBillState.value) { totalBillState.value.trim().isNotEmpty() }
     val keyboardController = LocalSoftwareKeyboardController.current
+    val sliderPositionState = remember { mutableStateOf(0f) }
+
     Surface(
         modifier = Modifier
             .padding(5.dp)
@@ -125,20 +134,38 @@ fun BillForm(modifier: Modifier = Modifier, onValChange: (String) -> Unit = {}) 
                 }
             )
 
-            if (validState) {
+//            if (validState) {
                 Row(modifier = Modifier.padding(5.dp), horizontalArrangement = Arrangement.Start, verticalAlignment = Alignment.CenterVertically) {
                     Text("Split", modifier = Modifier.align(alignment = Alignment.CenterVertically))
-                    Spacer(modifier = Modifier.padding(50.dp))
+                    Spacer(modifier = Modifier.width(150.dp))
                     Row(modifier = Modifier.padding(5.dp), horizontalArrangement = Arrangement.End) {
                         RoundIconButton(imageVector = Icons.Default.Remove, onClick = {})
-
+                        Text("2", modifier = Modifier.align(Alignment.CenterVertically).padding(start = 10.dp, end = 10.dp))
                         RoundIconButton(imageVector = Icons.Default.Add, onClick = {})
 
                     }
                 }
-            } else {
-                Box() {}
-            }
+
+                //Tip Row
+                Row(modifier = Modifier.padding(5.dp), horizontalArrangement = Arrangement.Start, verticalAlignment = Alignment.CenterVertically) {
+                    Text("Tip", modifier = Modifier.align(alignment = Alignment.CenterVertically))
+                    Spacer(modifier = Modifier.width(260.dp))
+                    Text("$33.00", modifier = Modifier.align(alignment = Alignment.CenterVertically))
+                }
+
+                //Slider
+                Column(modifier = Modifier.padding(5.dp), verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally) {
+                    Text("33%")
+                    Spacer(modifier = Modifier.height(20.dp))
+                    Slider(value = sliderPositionState.value, onValueChange = {newVal ->
+                        sliderPositionState.value = newVal
+                        Log.d("Slider", "Bill Form: $newVal")},
+                        modifier = Modifier.padding(start = 15.dp, end = 15.dp),
+                        steps = 5)
+                }
+//            } else {
+//                Box() {}
+//            }
 
         }
     }
